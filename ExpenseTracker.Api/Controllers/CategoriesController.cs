@@ -1,5 +1,6 @@
 ﻿using ExpenseTracker.Api.Data;
 using ExpenseTracker.Api.Dtos;
+using ExpenseTracker.Api.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,20 @@ namespace ExpenseTracker.Api.Controllers
             }
 
             return Ok(category);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<CategoryDto>> Create([FromBody] CreateCategoryDto createCategoryDto)
+        {
+            Category category = new Category { Name = createCategoryDto.Name, Type = createCategoryDto.Type};
+
+            _db.Categories.Add(category);
+
+            await _db.SaveChangesAsync();
+
+            CategoryDto categoryDto = new CategoryDto(category.Id, category.Name, category.Type);
+
+            return CreatedAtAction(nameof(GetById), new { id = category.Id }, categoryDto);
         }
 
     }
