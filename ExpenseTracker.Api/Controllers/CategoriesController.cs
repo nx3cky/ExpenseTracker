@@ -35,7 +35,7 @@ namespace ExpenseTracker.Api.Controllers
                 .FirstOrDefaultAsync();
 
             if (category == null)
-            { 
+            {
                 return NotFound();
             }
 
@@ -45,7 +45,7 @@ namespace ExpenseTracker.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<CategoryDto>> Create([FromBody] CreateCategoryDto createCategoryDto)
         {
-            Category category = new Category { Name = createCategoryDto.Name, Type = createCategoryDto.Type};
+            Category category = new Category { Name = createCategoryDto.Name, Type = createCategoryDto.Type };
 
             _db.Categories.Add(category);
 
@@ -68,6 +68,22 @@ namespace ExpenseTracker.Api.Controllers
             category.Name = updateCategoryDto.Name;
             category.Type = updateCategoryDto.Type;
 
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var category = await _db.Categories.FindAsync(id);
+
+            if(category == null)
+            {
+                return NotFound();
+            }
+
+            _db.Categories.Remove(category);
             await _db.SaveChangesAsync();
 
             return NoContent();
