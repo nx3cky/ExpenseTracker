@@ -56,5 +56,21 @@ namespace ExpenseTracker.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = category.Id }, categoryDto);
         }
 
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto updateCategoryDto)
+        {
+            var category = await _db.Categories.FindAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            category.Name = updateCategoryDto.Name;
+            category.Type = updateCategoryDto.Type;
+
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
