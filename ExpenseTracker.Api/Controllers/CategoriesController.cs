@@ -83,6 +83,15 @@ namespace ExpenseTracker.Api.Controllers
                 return NotFound();
             }
 
+            bool hasTransaction = await _db.Transactions.AnyAsync(t => t.CategoryId == category.Id);
+
+            if (hasTransaction)
+            {
+                return Problem(
+                    detail: "Category has transactions and cannot be deleted.",
+                    statusCode: StatusCodes.Status409Conflict);
+            }
+
             _db.Categories.Remove(category);
             await _db.SaveChangesAsync();
 
