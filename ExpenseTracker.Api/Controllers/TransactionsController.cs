@@ -92,5 +92,21 @@ namespace ExpenseTracker.Api.Controllers
 
             return NoContent();
         }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var transaction = await _db.Transactions.FindAsync(id);
+
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+
+            _db.Transactions.Remove(transaction);
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
