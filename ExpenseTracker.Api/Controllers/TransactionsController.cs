@@ -64,5 +64,33 @@ namespace ExpenseTracker.Api.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = transaction.Id }, transactionDto);  
         }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateTransactionDto dto)
+        {
+            var transaction = await _db.Transactions.FindAsync(id);
+
+            if(transaction == null)
+            {
+                return NotFound();
+            }
+
+            bool categoryExists = await _db.Categories.AnyAsync(c => c.Id == dto.CategoryId);
+
+            if (!categoryExists)
+            {
+                ModelState.AddModelError(nameof(dto.CategoryId), "Category not found.");
+                return ValidationProblem(ModelState);
+            }
+
+            transaction.Amount = dto.Amount;
+            transaction.Date = dto.Date.Value;
+            transaction.Description = dto.Description;
+            transaction.CategoryId = dto.CategoryId;
+
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
